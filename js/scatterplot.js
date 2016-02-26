@@ -1,5 +1,9 @@
-function scatterplot(data, athlete_selection){
-	//console.log(athlete_selection);
+/* --------------------------------------------------------------------------------
+Script for BS1807 Assignment 2b that creates a scatter plot
+Jim Leach
+2016/02/26
+*/
+function scatterplot(data, athlete_selection, axis = true){
 // Set up ahead of drawing plot ---------------------------------------------------------------
 // Create helper variables to save some typing 
 var xVar = "Appearances",
@@ -10,9 +14,9 @@ var force = d3.layout.force()
 			.nodes(data)
 			.size([width, height])
 			.on("tick", tick)
-			.charge(-5)
+			.charge(-2.5)
 			.gravity(0)
-			.chargeDistance(50);
+			.chargeDistance(10);
 
 // Set up x and y domains 
 x.domain([0, d3.max(data, function(d) { return d.Appearances; })]).nice();
@@ -36,56 +40,65 @@ var filteredData = rawData;
 if (athlete_selection !== null) {
 	// If there is an athlete selection then just include those data items
 	filteredData = data.filter(function(d) {
-		var present = contains(athlete_selection, d.Athlete);
-		// console.log(present)
-		if (present) { return d.Athlete; };
+		var idx = athlete_selection.indexOf(d.Athlete);
+		if (idx >= 0) { return d.Athlete; };
 		// return d.Athlete === athlete_selection;
 	});
 }
-// 	console.log(filteredData);
+
 
 // Create the plot -----------------------------------------------------------------------------
-// Add X-axis and label
-svg_scatter.append("g")
-	.attr("class", "x axis")
-	.attr("transform", "translate(0," + height + ")")
-	.call(xAxis)
-	.append("text")
-		.attr("class", "xlab")
-		.attr("x", width)
-		.attr("y", -6)
-		.style("text-anchor", "end")
-		.text("Appearances")
+if (axis === true){
+	// Add X-axis and label
+	svg_scatter.append("g")
+		.attr("class", "x axis")
+		.attr("transform", "translate(0," + height + ")")
+		.call(xAxis)
+		.append("text")
+			.attr("class", "xlab")
+			.attr("x", width - 20)
+			.attr("y", -6)
+			.style("text-anchor", "end")
+			.text("Appearances")
 
-// Add Y-axis and label
-svg_scatter.append("g")
-	.attr("class", "y axis")
-	.call(yAxis)
-	.append("text")
-      .attr("class", "ylab")
-      .attr("transform", "rotate(-90)")
-      .attr("x", -10)
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text("Medals")
+	// Add Y-axis and label
+	svg_scatter.append("g")
+		.attr("class", "y axis")
+		.call(yAxis)
+		.append("text")
+	      .attr("class", "ylab")
+	      .attr("transform", "rotate(-90)")
+	      .attr("x", -10)
+	      .attr("y", 6)
+	      .attr("dy", ".71em")
+	      .style("text-anchor", "end")
+	      .text("Medals")
 
-// Add X grid
-svg_scatter.append("g")         
-        .attr("class", "grid_scatter")
-        .attr("transform", "translate(0," + height + ")")
-        .call(make_x_axis()
-            .tickSize(-height, 0, 0)
-            .tickFormat("")
-        ) 
+    // Add Title
+    svg_scatter.append("text")
+    .attr("class", "plottitle")
+    .attr("text-anchor", "center")
+    .attr("y", -25)
+    .attr("x", width - 450)
+    .text("Total Medals vs Appearances");	      
 
-// Add Y grid
-svg_scatter.append("g")         
-	.attr("class", "grid_scatter")
-	.call(make_y_axis()
-	    .tickSize(-width, 0, 0)
-	    .tickFormat("")
-	)        
+	// Add X grid
+	svg_scatter.append("g")         
+	        .attr("class", "grid_scatter")
+	        .attr("transform", "translate(0," + height + ")")
+	        .call(make_x_axis()
+	            .tickSize(-height, 0, 0)
+	            .tickFormat("")
+	        ) 
+
+	// Add Y grid
+	svg_scatter.append("g")         
+		.attr("class", "grid_scatter")
+		.call(make_y_axis()
+		    .tickSize(-width, 0, 0)
+		    .tickFormat("")
+		) 
+}
 
 // Map data to dots
 var node = svg_scatter.selectAll(".dot")

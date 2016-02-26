@@ -1,17 +1,26 @@
+/* --------------------------------------------------------------------------------
+Main plotting script for BS1807 Assignment 2b
+Jim Leach
+2016/02/26
+*/
 // Set up overall SVG elements ----------------------------------------------------------
 // Variables for SVG sizing
-var margin = {top: 40, right: 20, bottom: 40, left: 160},
+var margin_bar = {top: 40, right: 20, bottom: 55, left: 180},
+    width_bar = 775 - margin_bar.left - margin_bar.right,
+    height_bar = 800 - margin_bar.top - margin_bar.bottom;
+
+var margin = {top: 40, right: 10, bottom: 80, left: 90},
     width = 750 - margin.left - margin.right,
-    height = 825 - margin.top - margin.bottom;
+    height = 800 - margin.top - margin.bottom;
     padding = 1;
     radius = 7.5;
 
 // SVG for barchart
 var svg = d3.select("body").append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
+        .attr("width", width_bar + margin_bar.left + margin_bar.right)
+        .attr("height", height_bar + margin_bar.top + margin_bar.bottom)
         .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")"); 
+        .attr("transform", "translate(" + margin_bar.left + "," + margin_bar.top + ")"); 
 
 // SVG for scatterplot
 var svg_scatter = d3.select("body").append("svg")
@@ -27,11 +36,11 @@ var color = d3.scale.ordinal().range(["#1f77b4", "#800080"]);
 // Set up variables for barplot -----------------------------------------------------------
 // X scale
 var x_bar = d3.scale.linear()
-        .range([0, width]);
+        .range([0, width_bar]);
 
 // Y scale
 var y_bar = d3.scale.ordinal()
-        .rangeRoundBands([0, height], .2);
+        .rangeRoundBands([0, height_bar], .2);
 
 // X axis
 var xAxis_bar = d3.svg.axis()
@@ -49,7 +58,7 @@ var tip = d3.tip()
           .attr('class', 'd3-tip')
           .offset([-10, 0])
           .html(function(d) {
-            return "<span>" + d.Sport + "</span><br><span>" + d.CountryName + "</span>";
+            return "<span>" + d.Athlete + "</span><br><span>" + d.Sport + "</span><br><span>" + d.CountryName + "</span>";
           })              
 svg.call(tip);
 
@@ -60,6 +69,14 @@ function make_x_axis_bar() {
                .orient("bottom")
                .ticks(13)
 }
+
+// Control button for force-directed layout
+var reset = d3.select("body").append("button")
+        .attr("id", "reset");
+var resetButton = reset.attr("id", "resetbutton")   
+        .attr("type", "button");
+    reset.append("span")
+      .text("Reset")
 
 
 // Set up variables for scatterplot ----------------------------------------------------------
@@ -117,7 +134,6 @@ function make_y_axis() {
 
 
 // Read in external data ----------------------------------------------------
-
 // After loading the data asynchronously they are stored in this variable
 var rawData;
 
@@ -129,7 +145,7 @@ d3.tsv("./data/data1_summary.csv", function(error, metaldata1) {
     d.Appearances = +d.Appearances
   });
   // Filter - just take athletes with >= 4 medals             
-  var filtered = metaldata1.filter(function(d) { return d.Medals >= 4; });
+  var filtered = metaldata1.filter(function(d) { return d.Medals >= 4 ; });
 
   // Sort the data such that the chart looks nicer
 
@@ -140,7 +156,8 @@ d3.tsv("./data/data1_summary.csv", function(error, metaldata1) {
 
   rawData = filtered_ordered;
 
-  update(null);
+
+  update(athlete_selection = null, grid = true);
 
 });
 

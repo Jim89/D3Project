@@ -1,7 +1,9 @@
-/**
-Generate a bar plot
-**/
-function barplot(data, athlete_selection) {
+/* --------------------------------------------------------------------------------
+Script for BS1807 Assignment 2b that creates a bar plot
+Jim Leach
+2016/02/26
+*/
+function barplot(data, athlete_selection, axis = true) {
 
 // Set up x and y domains
 x_bar.domain([0, d3.max(data, function(d) { return d.Medals; })]);
@@ -12,39 +14,48 @@ data.forEach(function(d) {
   d.color_bar = color(d.Gender);
 });
 
-
-// Add X axis
-svg.append("g")
+if (axis === true) {
+    // Add X axis
+      svg.append("g")
       .attr("class", "x axis")
       .call(xAxis_bar)
-    .selectAll("text")
-      .attr("y", -5)
-      .attr("x", -3)
-      .attr("dy", "-.55em")
-      .style("text-anchor", "start");
+      .selectAll("text")
+        .attr("y", -3.5)
+        .attr("x", -3)
+        .attr("dy", "-.55em")
+        .style("text-anchor", "start");
 
-// Add Y axis
-  svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis_bar);
-
-// Add x-axis label
-  svg.append("text")
+    // Add x-axis label
+    svg.append("text")
     .attr("class", "xlab")
     .attr("text-anchor", "right")
     .attr("y", 10)
-    .attr("x", width - 75)
+    .attr("x", width_bar - 75)
     .text("Total Medals");
 
-// Add X grid
-svg.append("g")         
-        .attr("class", "grid_bar")
-        .attr("transform", "translate(0," + height + ")")
-        .call(make_x_axis_bar()
-            .tickSize(-height, 0, 0)
-            .tickFormat("")
-        )     
-  
+    // Add Title
+    svg.append("text")
+    .attr("class", "plottitle")
+    .attr("text-anchor", "center")
+    .attr("y", -25)
+    .attr("x", width_bar - 375)
+    .text("Total Medals by Athlete");
+
+    // Add X grid
+    svg.append("g")         
+      .attr("class", "grid_bar")
+      .attr("transform", "translate(0," + height_bar + ")")
+      .call(make_x_axis_bar()
+      .tickSize(-height_bar, 0, 0)
+      .tickFormat("")
+      )
+
+    // Add Y axis
+    svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis_bar);
+}      
+ 
   
 // Bind data to bars 
 var bars = svg.selectAll(".bar")
@@ -70,7 +81,7 @@ var bars = svg.selectAll(".bar")
 
 // Add selection for filtering        
 // Set up (empty) array of selected athletes
-var athletes = athletes || [];
+athlete_selection = athlete_selection || []; 
 
       bars.on("click", function(d){
           // Select currently bound data element, i.e. the athlete
@@ -78,26 +89,31 @@ var athletes = athletes || [];
 
           // If CTRL key is held, add the selection to the list of athletes
             if (d3.event.ctrlKey) {
-              if(contains(athletes, new_athlete)) {
+              if(athlete_selection.indexOf(new_athlete) > 0 ) {
                 // remove from array
-                athletes.splice(athletes.indexOf(new_athlete), 1);
+                athlete_selection.splice(athlete_selection.indexOf(new_athlete), 1);
               } else {
                 // add to array
-                athletes.push(new_athlete);
+                athlete_selection.push(new_athlete);
                 }
               } else {
                 // clear existing array
-                athletes.length = 0;
+                athlete_selection.length = 0;
                 // add the only one
-                athletes.push(new_athlete)
+                athlete_selection.push(new_athlete)
               }
-              console.log(athletes);
-              update(athletes);
-        });
+              update(athlete_selection, grid = false);
+            });
 
 
 // Exit phase: remove remaining dom elements
     bars.exit().remove();
+
+
+// Set default force layout
+d3.select("#resetbutton").on("click", function() {
+  update(athlete_selection = null, grid = false);
+});
 
 } 
 
