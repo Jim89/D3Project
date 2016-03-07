@@ -110,7 +110,7 @@ athlete_selection = athlete_selection || [];
     bars.exit().remove();
 
 
-// Set default force layout
+// Set up reset button
 d3.select("#resetbutton").on("click", function() {
   update(athlete_selection = null, grid = false);
 });

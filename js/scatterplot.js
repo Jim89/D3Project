@@ -171,8 +171,8 @@ function tick(e) {
 
 function moveTowardDataPosition(alpha) {
 	return function(d) {
-		d.x += (x(d[xVar]) - d.x) * 0.1 * alpha;
-		d.y += (y(d[yVar]) - d.y) * 0.1 * alpha;
+		d.x += (x(d[xVar]) - d.x) * .09 * alpha;
+		d.y += (y(d[yVar]) - d.y) * .09 * alpha;
 	};
 }
 
